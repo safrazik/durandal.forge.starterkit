@@ -1,0 +1,20 @@
+import {FlickrService} from 'app/flickr/FlickrService';
+import {Http} from 'app/lib/Http';
+import {load} from 'durandal.forge';
+
+describe('Flickr', function() {
+  var flickr;
+
+  beforeEach(function() {
+    flickr = load(FlickrService);
+  });
+
+  it('should work', function() {
+    expect(flickr.http instanceof Http).toBe(true);
+  });
+
+  it('should fail', function() {
+    // See the stack traces with source maps...
+    expect(flickr.blabla).toBeDefined();
+  });
+});

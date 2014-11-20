@@ -1,0 +1,26 @@
+<html>
+  <head>
+        <title>Durangular StarterKit</title>
+
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+
+        <link rel="stylesheet" href="./build/style.css">
+  </head>
+  <body>
+    <div id="applicationHost">
+        <div class="splash">
+            <i class="fa fa-spinner fa-spin icon-loading"></i>
+        </div>
+    </div>
+
+    <script src="./node_modules/traceur/bin/traceur-runtime.js"></script>
+    <script src="./node_modules/requirejs/require.js"></script>
+    <script src="./config.requirejs.js"></script>
+
+    <script>
+      require.config(REQUIREJS_CONFIG);
+    </script>
+
+  </body>
+</html>
