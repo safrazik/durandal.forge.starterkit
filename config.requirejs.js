@@ -1,19 +1,15 @@
 var isNode = typeof exports != 'undefined';
-var isDeploy = isNode;
+var isDist = isNode;
 
 var bower, npm;
 
-if(isDeploy){
+if(isDist){
   bower = '../deps';
   npm = '../deps';
 }
-else if(true){//typeof isDevMode !== "undefined" && isDevMode) {
+else {
   bower = '../../bower_components';
   npm = '../../node_modules';
-}
-else {
-  bower = './bower_components';
-  npm = './node_modules';
 }
 
 
@@ -42,7 +38,7 @@ var REQUIREJS_CONFIG = {
     },
   },
   deps: ['main'],
-  baseUrl: (isDeploy ? '' : '/build/') + 'app',
+  baseUrl: (isDist ? '' : '/build/') + 'app',
 };
 
 if(isNode){

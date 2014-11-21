@@ -23,18 +23,20 @@ DurandalForge is a superset of [Durandal](http://durandaljs.com/) framework.
 - gulp `npm install -g gulp`
 - bower `npm install -g bower`
 - [Optional] karma `npm install -g karma-cli`
-- [Optional] protractor `npm install -g protractor`
 
 ### Installation
 
 - Clone the project
 - Install node packages `npm install`
 - Install bower components `bower install`
-- [Optional] Download webdriver binaries for protractor `webdriver-manager update`
 
 ### Building and Running
 
 - `gulp build watch serve`
+
+### Distributing
+
+- `gulp dist`
 
 
 ### [Optional] Unit Testing 

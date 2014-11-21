@@ -1,16 +1,14 @@
 module.exports = {
-  "description": "Defines the bower/npm installed files that should be copied to build directory",
+  "description": "Defines the bower/npm installed files that should be copied when distributing",
   "bower": [
     "bootstrap/dist/js/bootstrap.js",
     "durandal/js/**/*.js",
-    "durangular.punches/build/output/durangular.punches.js",
-    "jquery/dist/jquery.js",
+    "durandal.punches/build/output/durandal.punches.js",
+    "jquery/jquery.js",
     "knockout.js/knockout.debug.js",
     "requirejs-text/text.js",
     "font-awesome/fonts/**/*",
-    "kingdom/dist/amd/**/*",
-    "durangular/**/*",
-    "moment/moment.js"
+    "durandal.forge/dist/amd/**/*"
   ],
   "npm": [
     "di/dist/amd/**/*",

@@ -4,6 +4,10 @@ var connect = require('gulp-connect');
 var rename_ = require('gulp-rename');
 var durandal = require('gulp-durandal');
 var livereload = require('gulp-livereload');
+var fs = require('fs');
+var del = require('del');
+
+var depsConfig = require('./config.deps');
 
 
 var less = require('gulp-less');
@@ -22,6 +26,8 @@ var TRACEUR_OPTIONS = {
 
 var PATH = {
   BUILD: './build/',
+  DIST: './dist/',
+  DIST_TEMP: './dist_temp/',
   SRC: './app/**/*.ats',
   COPY: ['./app/**/*.html', './app/**/*.js'],
   TEST: './test/**/*.ats',
@@ -33,6 +39,9 @@ var PATH = {
 
 // A wrapper around gulp-rename to support `dirnamePrefix`.
 function rename(obj) {
+  if(!(obj && obj.dirnamePrefix)){
+    return rename_(obj);
+  }
   return rename_(function(parsedPath) {
     return {
       extname: obj.extname || parsedPath.extname,
@@ -87,20 +96,20 @@ gulp.task('build/css/sass', function(){
 });
 
 
-gulp.task('build/copy_deps', function(){
-  var depsConfig = require('./config.deps');
-  var bowerPath = 'bower_components',
-      npmPath = 'node_modules';
-  gulp.src(depsConfig.bower, {base: './' + bowerPath, cwd: bowerPath})
-    .pipe(gulp.dest(PATH.BUILD + 'deps/'));
-  gulp.src(depsConfig.npm, {base: './' + npmPath, cwd: npmPath})
-    .pipe(gulp.dest(PATH.BUILD + 'deps/'));
+//gulp.task('build/copy_deps', function(){
+//  var depsConfig = require('./config.deps');
+//  var bowerPath = 'bower_components',
+//      npmPath = 'node_modules';
+//  gulp.src(depsConfig.bower, {base: './' + bowerPath, cwd: bowerPath})
+//    .pipe(gulp.dest(PATH.BUILD + 'deps/'));
+//  gulp.src(depsConfig.npm, {base: './' + npmPath, cwd: npmPath})
+//    .pipe(gulp.dest(PATH.BUILD + 'deps/'));
 
-});
+//});
 
 gulp.task('build/css', ['build/css/less', 'build/css/sass']);
 
-gulp.task('build', ['build/src', 'build/test', 'build/copy', 'build/css', 'build/copy_deps']);
+gulp.task('build', ['build/src', 'build/test', 'build/copy', 'build/css']);
 
 // WATCH FILES FOR CHANGES
 gulp.task('watch', function() {
@@ -138,25 +147,20 @@ gulp.task('serve', function() {
   });
 });
 
-gulp.task('durandal', function(){
+gulp.task('dist/merge', function(){
 
     var REQUIREJS_CONFIG = require('./config.requirejs');
   
-    var fs = require('fs');
-  
-    var mainFile = 'build/app/main.js';
+    var mainFile = PATH.DIST_TEMP + 'app/main.js';
     var mainFileContent = fs.readFileSync(mainFile, {encoding: 'utf-8'});
     
     var mainFileContentNew = 'require.config(' + JSON.stringify(REQUIREJS_CONFIG) + ');\n\n' + mainFileContent;
     
-    var writeHead = true;
-    
-    if(writeHead){
-      fs.writeFileSync(mainFile, mainFileContentNew);
-    }
-    return durandal({
+    fs.writeFileSync(mainFile, mainFileContentNew);
+
+    durandal({
       verbose: true,
-      baseDir: 'build/app',
+      baseDir: PATH.DIST_TEMP + 'app',
       main: 'main.js',
       output: 'main-built.js',
       almond: true,
@@ -166,17 +170,87 @@ gulp.task('durandal', function(){
         rjsConfig.map = REQUIREJS_CONFIG.map;
         rjsConfig.paths = REQUIREJS_CONFIG.paths;
         rjsConfig.shim = REQUIREJS_CONFIG.shim;
-        // TODO implement in the right way
-        rjsConfig.onFinish = function(){
-          if(writeHead){
-            fs.writeFileSync(mainFile, mainFileContent);
-          }
-        }
         return rjsConfig;
       },
     })
-    .pipe(gulp.dest('deploy'));
- 
+    .pipe(gulp.dest(PATH.DIST));
 });
 
 gulp.task('default', ['serve', 'watch']);
+
+gulp.task('dist/temp_copy', function(){
+  gulp.src(PATH.BUILD + '**/*')
+    .pipe(gulp.dest(PATH.DIST_TEMP));
+});
+
+gulp.task('dist/temp_copy_deps/bower', function(){
+  var bowerPath = 'bower_components';
+  gulp.src(depsConfig.bower, {base: './' + bowerPath, cwd: bowerPath})
+    .pipe(gulp.dest(PATH.DIST_TEMP + 'deps/'));
+});
+
+gulp.task('dist/temp_copy_deps/npm', function(){
+  var npmPath = 'node_modules';
+  gulp.src(depsConfig.npm, {base: './' + npmPath, cwd: npmPath})
+    .pipe(gulp.dest(PATH.DIST_TEMP + 'deps/'));
+});
+
+gulp.task('dist/temp_copy_deps', ['dist/temp_copy_deps/bower', 'dist/temp_copy_deps/npm']);
+
+gulp.task('dist/copy', function(){
+  gulp.src('./index-dist.html')
+    .pipe(rename_({
+      basename: 'index'
+    }))
+    .pipe(gulp.dest(PATH.DIST));
+
+  gulp.src('./node_modules/traceur/bin/traceur-runtime.js')
+    .pipe(gulp.dest(PATH.DIST));
+
+  gulp.src([PATH.DIST_TEMP + '**',
+            '!' + PATH.DIST_TEMP + '**/*.js',
+            '!' + PATH.DIST_TEMP + '**/*.map',
+            '!' + PATH.DIST_TEMP + '**/*.html',
+           ])
+            .pipe(gulp.dest(PATH.DIST));
+});
+
+gulp.task('dist_temp', ['dist/temp_copy', 'dist/temp_copy_deps']);
+gulp.task('dist_output', ['dist/merge', 'dist/copy']);
+
+
+gulp.task('dist', function(cb){
+  var exec = require('child_process').exec;
+
+  var tasks = ['clean', 'build', 'dist_temp', 'dist_output'];
+
+  var deleteDistTemp = function(){
+    del([PATH.DIST_TEMP + '**']);
+  }
+
+  var runChild = function(i){
+    if(!tasks[i]){
+      return deleteDistTemp();
+    }
+    exec('gulp ' + tasks[i], function(error, stdout, stderr){
+      if (error !== null) {
+        console.log(task + ' error: ' + error);
+        console.log(stderr);
+      }
+      else {
+        console.log(stdout);
+      }
+      runChild(i+1);
+    });
+  }
+
+  runChild(0);
+
+});
+
+gulp.task('clean', function(cb){
+    del([
+      PATH.BUILD + '**',
+      PATH.DIST_TEMP + '**',
+  ], cb);
+});
