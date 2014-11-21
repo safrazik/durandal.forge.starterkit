@@ -95,18 +95,6 @@ gulp.task('build/css/sass', function(){
   }
 });
 
-
-//gulp.task('build/copy_deps', function(){
-//  var depsConfig = require('./config.deps');
-//  var bowerPath = 'bower_components',
-//      npmPath = 'node_modules';
-//  gulp.src(depsConfig.bower, {base: './' + bowerPath, cwd: bowerPath})
-//    .pipe(gulp.dest(PATH.BUILD + 'deps/'));
-//  gulp.src(depsConfig.npm, {base: './' + npmPath, cwd: npmPath})
-//    .pipe(gulp.dest(PATH.BUILD + 'deps/'));
-
-//});
-
 gulp.task('build/css', ['build/css/less', 'build/css/sass']);
 
 gulp.task('build', ['build/src', 'build/test', 'build/copy', 'build/css']);
@@ -183,19 +171,12 @@ gulp.task('dist/temp_copy', function(){
     .pipe(gulp.dest(PATH.DIST_TEMP));
 });
 
-gulp.task('dist/temp_copy_deps/bower', function(){
-  var bowerPath = 'bower_components';
-  gulp.src(depsConfig.bower, {base: './' + bowerPath, cwd: bowerPath})
-    .pipe(gulp.dest(PATH.DIST_TEMP + 'deps/'));
+gulp.task('dist/temp_copy_deps', function(){
+  ['node_modules', 'bower_components'].forEach(function(depsPath){
+  gulp.src(depsConfig[depsPath], {base: './' + depsPath, cwd: depsPath})
+    .pipe(gulp.dest(PATH.DIST_TEMP + depsPath + '/'));
+  });
 });
-
-gulp.task('dist/temp_copy_deps/npm', function(){
-  var npmPath = 'node_modules';
-  gulp.src(depsConfig.npm, {base: './' + npmPath, cwd: npmPath})
-    .pipe(gulp.dest(PATH.DIST_TEMP + 'deps/'));
-});
-
-gulp.task('dist/temp_copy_deps', ['dist/temp_copy_deps/bower', 'dist/temp_copy_deps/npm']);
 
 gulp.task('dist/copy', function(){
   gulp.src('./index-dist.html')

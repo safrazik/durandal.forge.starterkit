@@ -4,8 +4,8 @@ var isDist = isNode;
 var bower, npm;
 
 if(isDist){
-  bower = '../deps';
-  npm = '../deps';
+  bower = '../bower_components';
+  npm = '../node_modules';
 }
 else {
   bower = '../../bower_components';
