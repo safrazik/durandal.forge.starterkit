@@ -15,8 +15,8 @@
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
-            <ul class="nav navbar-nav" bind-repeat="router.navigationModel as route">
-                <li bind-css="{ active: route.isActive }">
+            <ul class="nav navbar-nav">
+                <li bind-css="{ active: route.isActive }" bind-repeat="router.navigationModel as route">
                     <a href="{{route.hash}}">{{route.title}}</a>
                 </li>
             </ul>
