@@ -1,5 +1,20 @@
 # DurandalForge StarterKit
 
+## Introduction
+
+DurandalForge is a superset of [Durandal](http://durandaljs.com/) framework.
+
+### Features
+
+- [gulp](http://gulpjs.com/)
+- Backward Compatible with Durandal
+- ES6/AtScript for viewmodels, with Source Maps
+- LESS support with Source Map
+- [Coming soon] Sass support
+- Support for distributing into one single file
+- LiveReload
+- [bower](http://bower.io/) and [npm](http://npmjs.org/) support
+
 ## Getting started
 
 ### Requirements
