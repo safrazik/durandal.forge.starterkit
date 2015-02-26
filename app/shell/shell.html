@@ -16,14 +16,14 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
             <ul class="nav navbar-nav">
-                <li bind-css="{ active: route.isActive }" bind-repeat="router.navigationModel as route">
-                    <a href="{{route.hash}}">{{route.title}}</a>
+                <li css.bind="{ active: route.isActive }" repeat.for="route of router.navigationModel">
+                    <a href="${route.hash}">${route.title}</a>
                 </li>
             </ul>
 
-          
+
             <ul class="nav navbar-nav navbar-right">
-                <li class="loader" bind-css="{ active: router.isNavigating }">
+                <li class="loader" css.bind="{ active: router.isNavigating }">
                     <i class="fa fa-spinner fa-spin fa-2x"></i>
                 </li>
             </ul>
@@ -37,6 +37,6 @@
     </nav>
 
     <div class="page-host">
-      <router-view-port bind-transition="'entrance'"></router-view-port>
+      <router-view-port transition.bind="'entrance'"></router-view-port>
     </div>
 </div>

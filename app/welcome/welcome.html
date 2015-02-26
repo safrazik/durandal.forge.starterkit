@@ -1,11 +1,11 @@
 <section>
-    <h2>{{displayName|forge}}</h2>
+    <h2>${displayName|forge}</h2>
     
-    <blockquote>{{description}}</blockquote>
+    <blockquote>${description}</blockquote>
     <h3>Features</h3>
     <ul>
-      <li bind-repeat="features as feature">
-        {{feature}}
+      <li repeat.for="feature of features">
+        ${feature}
       </li>
     </ul>
     <div class="alert alert-success">

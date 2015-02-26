@@ -1,9 +1,9 @@
 <section>
-    <h2>{{displayName}}</h2>
+    <h2>${displayName}</h2>
     <div class="row">
-        <div class="col-sm-6 col-md-3" bind-repeat="images as image">
+        <div class="col-sm-6 col-md-3" repeat.for="image of images">
             <a href="#" class="thumbnail" on-click="select(image)">
-                <img style="width: 260px; height: 180px;" src="{{image.media.m}}"/>
+                <img style="width: 260px; height: 180px;" src="${image.media.m}"/>
             </a>
         </div>
     </div>
