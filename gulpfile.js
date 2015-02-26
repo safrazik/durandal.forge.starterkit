@@ -6,13 +6,14 @@ var durandal = require('gulp-durandal');
 var livereload = require('gulp-livereload');
 var fs = require('fs');
 var del = require('del');
+var sourcemaps = require('gulp-sourcemaps');
 
 var depsConfig = require('./config.deps');
 
 
 var less = require('gulp-less');
 // @TODO add sass support
-//var sass = require('gulp-sass');
+var sass = require('gulp-sass');
 
 var TRACEUR_OPTIONS = {
   "modules": "amd",
@@ -33,7 +34,7 @@ var PATH = {
   TEST: './test/**/*.ats',
   LESS: './assets/**/*.less',
   SASS: './assets/**/*.scss',
-  LESS_INDEX: './assets/style.less',
+  // LESS_INDEX: './assets/style.less',
   SASS_INDEX: './assets/style.scss',
 };
 
@@ -79,19 +80,22 @@ gulp.task('build/css/less', function(){
 //  console.log('__DIRNAME ' + __dirname);
   if(PATH.LESS_INDEX){
     gulp.src(PATH.LESS_INDEX)
+    .pipe(sourcemaps.init())
     .pipe(less({
-//      paths: [ path.join(__dirname, 'less', 'includes') ],
-      paths: ['.'],
-      sourceMap: true,
-      sourceMapBasepath: __dirname,
-      sourceMapRootpath: '../', // above build directory
+      paths: ['.']
     }))
+    .pipe(sourcemaps.write())
     .pipe(gulp.dest(PATH.BUILD));
   }
 });
 
 gulp.task('build/css/sass', function(){
-  if(PATH.SASS){
+  if(PATH.SASS_INDEX){
+    gulp.src(PATH.SASS_INDEX)
+    .pipe(sourcemaps.init())
+    .pipe(sass())
+    .pipe(sourcemaps.write())
+    .pipe(gulp.dest(PATH.BUILD));
   }
 });
 
@@ -101,28 +105,28 @@ gulp.task('build', ['build/src', 'build/test', 'build/copy', 'build/css']);
 
 // WATCH FILES FOR CHANGES
 gulp.task('watch', function() {
-  
+
   var server = livereload.listen(35729);
-  
+
   gulp.watch(PATH.BUILD + '**/*.css').on('change', function(file) {
       livereload.changed(file);
   });
-  
+
   if(PATH.LESS){
     gulp.watch(PATH.LESS, ['build/css/less']);
   }
   if(PATH.SASS){
     gulp.watch(PATH.SASS, ['build/css/sass']);
   }
-  
+
   gulp.watch(PATH.SRC, ['build/src']).on('change', function(file){
     livereload.changed(file);
   });
-  
+
   gulp.watch(PATH.COPY, ['build/copy']).on('change', function(file){
     livereload.changed(file);
   });
-  
+
 });
 
 
@@ -138,12 +142,12 @@ gulp.task('serve', function() {
 gulp.task('dist/merge', function(){
 
     var REQUIREJS_CONFIG = require('./config.requirejs');
-  
+
     var mainFile = PATH.DIST_TEMP + 'app/main.js';
     var mainFileContent = fs.readFileSync(mainFile, {encoding: 'utf-8'});
-    
+
     var mainFileContentNew = 'require.config(' + JSON.stringify(REQUIREJS_CONFIG) + ');\n\n' + mainFileContent;
-    
+
     fs.writeFileSync(mainFile, mainFileContentNew);
 
     durandal({
@@ -164,7 +168,7 @@ gulp.task('dist/merge', function(){
     .pipe(gulp.dest(PATH.DIST));
 });
 
-gulp.task('default', ['serve', 'watch']);
+gulp.task('default', ['build', 'watch', 'serve']);
 
 gulp.task('dist/temp_copy', function(){
   gulp.src(PATH.BUILD + '**/*')
@@ -207,7 +211,7 @@ gulp.task('dist', function(cb){
 
   var deleteDistTemp = function(){
     del([PATH.DIST_TEMP + '**']);
-  }
+  };
 
   var runChild = function(i){
     if(!tasks[i]){
@@ -223,7 +227,7 @@ gulp.task('dist', function(cb){
       }
       runChild(i+1);
     });
-  }
+  };
 
   runChild(0);
 

@@ -1,0 +1,43 @@
+.splash {
+
+  $splash-logo-height: 120px;
+  $splash-loading-height: $splash-logo-height/3;
+  $splash-margin: 30px;
+  $splash-total-height: $splash-logo-height + $splash-loading-height + $splash-margin;
+
+  background: #FFF;
+  color: $brand-primary;
+  
+  // color: #FFF;
+  // background: $brand-primary;
+
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  .message {
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    text-align: center;
+    margin-top: -1 * ($splash-total-height)/2;
+
+  }
+
+  .logo {
+    height: $splash-logo-height;
+  }
+
+  .icon-loading {
+    // color: #AAA;
+    font-weight: normal;
+    display: block;
+    font-size: $splash-loading-height;
+    line-height: $splash-loading-height;
+    text-align: center;
+    margin-top: $splash-margin;
+  }
+
+}

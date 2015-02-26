@@ -16,8 +16,9 @@
     "durandal": "~2.1.0",
     "durandal.punches": "DurandalForge/durandal.punches#master",
     "durandal.forge": "DurandalForge/durandal.forge#master",
-    "bootstrap": "~3.2.0",
+    "bootstrap": "~3.3.3",
     "font-awesome": "~4.2.0",
-    "jquery": "1.9.1"
+    "jquery": "1.9.1",
+    "bootstrap-sass": "~3.3.3"
   }
 }
