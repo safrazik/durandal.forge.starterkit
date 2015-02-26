@@ -12,7 +12,6 @@ var depsConfig = require('./config.deps');
 
 
 var less = require('gulp-less');
-// @TODO add sass support
 var sass = require('gulp-sass');
 
 var TRACEUR_OPTIONS = {
@@ -29,11 +28,14 @@ var PATH = {
   BUILD: './build/',
   DIST: './dist/',
   DIST_TEMP: './dist_temp/',
-  SRC: './app/**/*.ats',
-  COPY: ['./app/**/*.html', './app/**/*.js'],
+  SRC: './app/**/*.js',
+  // COPY: ['./app/**/*.html', './app/**/*.js'],
+  LEGACY: './app/**/*.es5.js',
+  COPY: ['./assets/**/!(*.less|*.scss)', './app/**/*.html'],
   TEST: './test/**/*.ats',
   LESS: './assets/**/*.less',
   SASS: './assets/**/*.scss',
+  // Either one of LESS_INDEX or SASS_INDEX should be used.
   // LESS_INDEX: './assets/style.less',
   SASS_INDEX: './assets/style.scss',
 };
@@ -55,7 +57,7 @@ function rename(obj) {
 
 // TRANSPILE AT SCRIPT
 gulp.task('build/src', function() {
-  gulp.src(PATH.SRC, {base: '.'})
+  gulp.src([PATH.SRC, '!' + PATH.LEGACY], {base: '.'})
       // Rename before Traceur, so that Traceur has the knowledge of both input and output paths.
       .pipe(rename({extname: '.js', dirnamePrefix: PATH.BUILD}))
       .pipe(traceur(TRACEUR_OPTIONS))
@@ -67,6 +69,16 @@ gulp.task('build/test', function() {
       // Rename before Traceur, so that Traceur has the knowledge of both input and output paths.
       .pipe(rename({extname: '.js', dirnamePrefix: PATH.BUILD}))
       .pipe(traceur(TRACEUR_OPTIONS))
+      .pipe(gulp.dest('.'));
+});
+
+// COPY ES5
+gulp.task('build/legacy', function() {
+  gulp.src(PATH.LEGACY, {base: '.'})
+      .pipe(rename(function (path) {
+        path.basename = path.basename.replace('.es5', '');
+        path.dirname = PATH.BUILD + path.dirname;
+      }))
       .pipe(gulp.dest('.'));
 });
 
@@ -101,7 +113,7 @@ gulp.task('build/css/sass', function(){
 
 gulp.task('build/css', ['build/css/less', 'build/css/sass']);
 
-gulp.task('build', ['build/src', 'build/test', 'build/copy', 'build/css']);
+gulp.task('build', ['build/src', 'build/test', 'build/legacy', 'build/copy', 'build/css']);
 
 // WATCH FILES FOR CHANGES
 gulp.task('watch', function() {
